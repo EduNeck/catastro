@@ -1,24 +1,13 @@
 <template>
   <v-app>
     <v-main>
-      <PantallaInicio/>
-    </v-main>
+      <router-view></router-view>
+    </v-main>    
   </v-app>
 </template>
 
 <script>
-
-import PantallaInicio from './components/PantallaInicio.vue';
-
 export default {
-  name: 'App',
-
-  components: {    
-    PantallaInicio,
-  },
-
-  data: () => ({
-    //
-  }),
-}
+  name: 'App'
+};
 </script>
