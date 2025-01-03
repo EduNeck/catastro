@@ -12,7 +12,7 @@
       
       <v-col class="mb-4">
         <h1 class="display-2 font-weight-bold mb-3">
-          GADM Gobierno Autónomo Descentralizado Intercultural y Plurinacional del Municipio de Cayambe
+          {{ organizationName }}
         </h1>  
       </v-col>  
       <v-col cols="12">
@@ -23,9 +23,18 @@
 </template>
 
 <script>
+
+import { textVariables } from '@/config/textVariables';
+
 export default {
-  name: 'PantallaInicio'
+  name: 'PantallaInicio',
+  data() {
+    return {
+      organizationName: textVariables.organizationName
+    }
+  }
 };
+
 </script>
 
 <style scoped>

@@ -1,69 +1,39 @@
 <template>
-  <v-container fill-height class="justify-center align-center no-padding">
-    <v-app-bar app color="primary" dark>
-      <v-img
-        src="@/assets/logo_ventana.png"
-        alt="Logo"
-        contain
-        max-height="40"
-        max-width="40"
-        class="mr-3"
-      ></v-img>
-      <v-toolbar-title class="title-responsive">GADM Gobierno Autónomo Descentralizado Intercultural y Plurinacional del Municipio de Cayambe</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon>mdi-account-circle</v-icon>
-      </v-btn>
-    </v-app-bar>
+  <v-container fill-height class="d-flex justify-center align-center no-padding">
+    <!-- Contenido de la página -->
+    <v-card width="500" class="mx-auto mt-16" elevation="16">
+      <v-card-title class="pb-0 text-center">
+        <h1>Ingreso Sistema</h1>
+      </v-card-title>
+      <v-spacer> </v-spacer>
+      <v-card-text>
+        <v-form>
+          <v-text-field 
+            label="Usuario" 
+            prepend-icon="mdi-account-circle"
+          />
+          <v-text-field 
+            :type="showPassword ? 'text' : 'password'" 
+            label="Contraseña"
+            prepend-icon="mdi-lock"
+            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append="showPassword = !showPassword"
+          />
+        </v-form>
+      </v-card-text>
+      <v-divider></v-divider>
+      <v-card-actions>
+        <v-btn color= "primary" variant="tonal" @click="login">Ingresar</v-btn>
+        <v-btn color= "success" variant="tonal" @click="salir">Salir</v-btn>
+      </v-card-actions>
+    </v-card> 
+    <!-- Contenido de la página -->
 
-    <v-row align="center" justify="center" class="flex-grow-1">
-      <v-col cols="12" sm="10" md="8" lg="6">
-        <v-card class="login-card">
-          <v-card-title class="pb-0 d-flex justify-center title-background">
-            <h3>INGRESO</h3>
-          </v-card-title>
-          <v-card-text>
-            <v-form>
-              <v-text-field 
-                label="Usuario" 
-                prepend-icon="mdi-account-circle"
-                v-model="username"
-              />
-              <v-text-field 
-                :type="showPassword ? 'text' : 'password'" 
-                label="Contraseña"
-                prepend-icon="mdi-lock"
-                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                @click:append="showPassword = !showPassword"
-                v-model="password"
-              />
-            </v-form>
-          </v-card-text>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-row justify="center" class="w-100">
-              <v-col cols="auto" class="d-flex justify-center">                             
-                <v-btn color="info" @click="login">Ingreso</v-btn>
-              </v-col>
-              <v-col cols="auto" class="d-flex justify-center">                             
-                <v-btn color="error" @click="salir">Salir</v-btn>
-              </v-col>
-            </v-row>              
-          </v-card-actions>
-          <v-divider></v-divider>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <v-footer app padless>
-      <v-col class="text-center">
-        <span>SIGCAL © {{ currentYear }}</span>
-      </v-col>
-    </v-footer>
   </v-container>
 </template>
 
 <script>
+
 export default {
   name: 'LoginSistema',
   data() {
@@ -71,9 +41,9 @@ export default {
       showPassword: false,
       username: '',
       password: '',
-      currentYear: new Date().getFullYear()
     }
   },
+
   methods: {
     login() {
       // Lógica de autenticación
@@ -87,5 +57,19 @@ export default {
       this.$router.push('/');
     }
   }
-}
+};
 </script>
+
+<style scoped>
+.title-background {
+  background-color:  #203de0; /* Color de fondo */
+  color: white; /* Color del texto */
+  padding: 8px; /* Espacio interno */
+  border-radius: 4px; /* Bordes redondeados */
+}
+
+h1 {
+  color: #3f51b5;
+  font-size: 2vw; 
+}
+</style>
