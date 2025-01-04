@@ -1,6 +1,6 @@
 <template>
-  <v-app>
-    <v-app-bar app color="primary" dark>
+  <v-app class="background">
+    <v-app-bar app color= #383838 dark>
       <v-img
         src="@/assets/logo_ventana.png"
         alt="Logo"
@@ -19,7 +19,7 @@
       <router-view></router-view>
     </v-main>    
 
-    <v-footer app padless>
+    <v-footer app padless color= #383838>
       <v-col class="text-center">
         <span>SIGCAL © {{ currentYear }}</span>
       </v-col>
@@ -43,3 +43,20 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.background {
+  background-color: #6E6E6E; 
+  min-height: 100vh;
+}
+
+.title-responsive {
+  font-size: 1.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+
+</style>

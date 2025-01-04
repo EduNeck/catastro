@@ -16,7 +16,7 @@
         </h1>  
       </v-col>  
       <v-col cols="12">
-        <v-btn color="primary" @click="$router.push('/login')">INGRESO</v-btn>
+        <v-btn color=#383838 @click="$router.push('/login')">INGRESO</v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -39,7 +39,7 @@ export default {
 
 <style scoped>
 h1 {
-  color: #3f51b5;
-  font-size: 2vw; /* Ajusta el tamaño de fuente según el ancho de la ventana */
+  color: #ffffff;
+  font-size: 2vw; 
 }
 </style>
