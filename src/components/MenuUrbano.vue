@@ -1,15 +1,21 @@
 <template>
-  <div class="d-flex justify-center align-center mt-10">
+  <v-app-bar color="#A9A9A9" :elevation="1" class="d-flex justify-center">
+    <v-app-bar-title class="text-center">URBANO</v-app-bar-title>
+  </v-app-bar>
+
+  <div class="d-flex justify-center align-center mt-10">    
     <!-- Menu Visor -->
     <v-menu>
-      <template v-slot:activator="{ props }">
-        <v-btn
+      <template v-slot:activator="{ props }" >
+        <v-btn 
+          append-icon="mdi-folder"
           color="white"
           v-bind="props"
-          variant="tonal" 
+          variant="tonal"
         >VISOR
         </v-btn>
-      </template>
+        <v-divider vertical> </v-divider>
+      </template>      
       <v-list>
         <v-list-item
           v-for="(item, index) in itemsVisor"
@@ -24,12 +30,15 @@
     <!-- Menu Gestion Catastral -->
     <v-menu>
       <template v-slot:activator="{ props }">
-        <v-btn
+        <v-divider vertical> </v-divider>
+        <v-btn 
+          append-icon="mdi-folder"
           color="white"
           v-bind="props"
           variant="tonal"
         >GESTIÓN CATASTRAL
         </v-btn>
+        <v-divider vertical> </v-divider>
       </template>
       <v-list>
         <v-list-item
@@ -45,12 +54,15 @@
     <!-- Menu Reportes -->
     <v-menu>
       <template v-slot:activator="{ props }">
-        <v-btn
+        <v-divider vertical> </v-divider>
+        <v-btn 
+          append-icon="mdi-folder"
           color="white"
           v-bind="props"
           variant="tonal" 
         >REPORTES
         </v-btn>
+        <v-divider vertical> </v-divider>
       </template>
       <v-list>
         <v-list-item
@@ -66,12 +78,15 @@
     <!-- Menu Valoracion -->
     <v-menu>
       <template v-slot:activator="{ props }">
-        <v-btn
+        <v-divider vertical> </v-divider>
+        <v-btn 
+          append-icon="mdi-folder"
           color="white"
           v-bind="props"
           variant="tonal" 
         >VALORACIÓN
         </v-btn>
+        <v-divider vertical> </v-divider>
       </template>
       <v-list>
         <v-list-item
@@ -84,9 +99,11 @@
         </v-list-item>
       </v-list>
     </v-menu>      
+    <v-divider vertical> </v-divider>
 
     <!-- Boton Salir -->
     <v-btn
+        append-icon="mdi-folder"
         color="white"
         variant="tonal" 
         @click="$router.push('/menu-ingreso')"
@@ -105,7 +122,7 @@ export default {
       { title: 'Geo Visor', route: '/visor-geo' },
     ],
     itemsGestionCatastral: [
-      { title: 'Ingreso Predio', route: '/ingreso-predio' },
+      { title: 'Ingreso Predio', route: '/ficha-predial-urb' },
       { title: 'Listado de Predios', route: '/listado-predios' },
       { title: 'Gestión Documental', route: '/gestion-documental' },
     ],
