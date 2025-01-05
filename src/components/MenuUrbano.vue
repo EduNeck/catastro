@@ -103,14 +103,24 @@
 
     <!-- Boton Salir -->
     <v-btn
-        append-icon="mdi-folder"
+        append-icon="mdi-close"
         color="white"
         variant="tonal" 
         @click="$router.push('/menu-ingreso')"
     >SALIR
     </v-btn>
-
   </div>
+
+  <v-col cols="12">
+    <v-img
+      src="@/assets/fondo-pantalla-gris.png "
+      class="my-3 centered-image"
+      contain
+      height="200"
+    />
+  </v-col>
+
+
 </template>
 
 <script>
@@ -162,3 +172,13 @@ export default {
 
 }
 </script>
+
+<style scoped>
+
+.centered-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Ajusta la imagen para que se contenga dentro del contenedor */
+}
+
+</style>

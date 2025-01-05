@@ -1,24 +1,22 @@
 <template>
   <v-container>
-    <v-tabs v-model="tab" background-color="primary" dark>
+    <v-tabs v-model="tab" background-color="primary" dark class="custom-tab">
       <v-tab v-for="(item, index) in tabs" :key="index">
         {{ item }}
       </v-tab>
     </v-tabs>
 
+    <!-- Tabs -->
     <v-window v-model="tab" show-arrows>
       <v-window-item :value="0">
         <TabIdentificacion />        
       </v-window-item> 
     </v-window>
 
-
-
   </v-container>
 </template>
 
 <script>
-
 import TabIdentificacion from './TabIdentificacion.vue';
 
 export default {
@@ -48,5 +46,11 @@ export default {
 <style scoped>
 .v-card {
   height: 200px;
+}
+</style>
+
+<style>
+.custom-tab .v-tab {
+  color: #ffffff; 
 }
 </style>
