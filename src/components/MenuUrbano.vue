@@ -12,6 +12,7 @@
           color="white"
           v-bind="props"
           variant="tonal"
+          class="custom-list-item"
         >VISOR
         </v-btn>
         <v-divider vertical> </v-divider>
@@ -21,7 +22,7 @@
           v-for="(item, index) in itemsVisor"
           :key="index"
           :value="index"
-          @click="navigateTo(item.route)"
+          @click="navigateTo(item.route)"          
         >
           <v-list-item-title>{{ item.title }}</v-list-item-title>
         </v-list-item>
@@ -36,6 +37,7 @@
           color="white"
           v-bind="props"
           variant="tonal"
+          class="custom-list-item"
         >GESTIÓN CATASTRAL
         </v-btn>
         <v-divider vertical> </v-divider>
@@ -60,6 +62,7 @@
           color="white"
           v-bind="props"
           variant="tonal" 
+          class="custom-list-item"
         >REPORTES
         </v-btn>
         <v-divider vertical> </v-divider>
@@ -84,6 +87,7 @@
           color="white"
           v-bind="props"
           variant="tonal" 
+          class="custom-list-item"
         >VALORACIÓN
         </v-btn>
         <v-divider vertical> </v-divider>
@@ -107,6 +111,7 @@
         color="white"
         variant="tonal" 
         @click="$router.push('/menu-ingreso')"
+        class="custom-list-item"
     >SALIR
     </v-btn>
   </div>
@@ -178,7 +183,17 @@ export default {
 .centered-image {
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain; /* Ajusta la imagen para que se contenga dentro del contenedor */
+  object-fit: contain; 
+}
+
+.custom-list-item {
+  background-color: #276E90;
+  color: #FFFFFF;
+  transition: background-color 0.3s ease;
+}
+
+.custom-list-item:hover {
+  background-color: #114358;
 }
 
 </style>

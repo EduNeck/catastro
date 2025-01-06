@@ -1,8 +1,9 @@
-const { defineConfig } = require('@vue/cli-service')
 const webpack = require('webpack');
 
-module.exports = defineConfig({
-  transpileDependencies: true,
+module.exports = {
+  transpileDependencies: [
+    'vuetify'
+  ],
 
   configureWebpack: {
     plugins: [
@@ -16,11 +17,10 @@ module.exports = defineConfig({
 
   pluginOptions: {
     vuetify: {
-			// https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
-		}
+      // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
+    }
   },
   publicPath: process.env.NODE_ENV === 'production'
-  ? '/catastro/'  // Cambia 'tu-repositorio' por el nombre real de tu repositorio
-  : '/'
-
-});
+    ? '/catastro/'  // Cambia 'tu-repositorio' por el nombre real de tu repositorio
+    : '/'
+};
