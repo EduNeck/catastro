@@ -73,9 +73,22 @@ const updateCatastroCiudadano = async (id, data) => {
   }
 };
 
+const recuperaCiudadanoTenencia = async () => {
+  const query = 'SELECT id_ciudadano, nombres, numero_documento FROM public.catastro_ciudadano LIMIT 100';
+  try {
+    const result = await db.query(query);
+    return result.rows;
+  }catch (err) {
+    console.error('Error executing query', err.stack);
+    throw err;
+  }
+}
+
+
 module.exports = {
   getAllCatastroCiudadano,
   getCatastroCiudadanoById,
   insertCatastroCiudadano, 
-  updateCatastroCiudadano
+  updateCatastroCiudadano,
+  recuperaCiudadanoTenencia
 };

@@ -75,9 +75,25 @@ const getCatastroTenenciaById = async (id) => {
     }
 };
 
+// Función para obtener todos los registros de la tabla `Catastro Tenencia`
+const getListadoTenenciaByPredio  = async (id) => {
+    const query = `SELECT id_tenencia, nombres, numero_documento, presenta_escritura, forma_propiedad,  tipo_persona,  porcentaje_participacion, regimen_propiedad
+                    FROM reporte_ficha.ficha_tenencia WHERE id_predio = $1;`;
+    const values = [id];
+
+    try {
+        const result = await db.query(query, values);
+        return result.rows;
+    } catch (err) {
+        console.error('Error executing query', err.stack);
+        throw err;
+    }
+};
+
 
 module.exports = {
     insertCatastroTenencia,
     updateCatastroTenencia,
-    getCatastroTenenciaById    
+    getCatastroTenenciaById,
+    getListadoTenenciaByPredio,    
 }

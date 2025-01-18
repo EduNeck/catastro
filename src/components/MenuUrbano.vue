@@ -138,7 +138,7 @@ export default {
     ],
     itemsGestionCatastral: [
       { title: 'Ingreso Predio', route: '/ficha-predial-urb' },
-      { title: 'Listado de Predios', route: '/listado-predios' },
+      { title: 'Listado de Predios', route: '/listado-predios-urb' },
       { title: 'Gestión Documental', route: '/gestion-documental' },
     ],
     itemsReportes: [

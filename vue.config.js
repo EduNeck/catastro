@@ -5,6 +5,10 @@ module.exports = {
     'vuetify'
   ],
 
+  devServer: {
+    port: 3000 // Cambia 3000 al puerto que desees usar
+  },
+
   configureWebpack: {
     plugins: [
       new webpack.DefinePlugin({

@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+
 const catastroCiudadanoModel = require('./db/models/catastroCiudadano');
 const catalogoModel = require('./db/models/catalogo');
 const catastoPredioModel = require('./db/models/catastroPredio');  
@@ -9,6 +10,7 @@ const catastroParroquia = require('./db/models/catastroParroquia');
 const catastroTenenciaModel = require('./db/models/catastroTenencia');
 const geoConsultasModel = require('./db/models/geoConsultas');
 const valoracionModel = require('./db/models/valoracion');
+const catalogoProvinciaCantonModel = require('./db/models/catalogoProvinciaCanton');
 
 dotenv.config();
 
@@ -64,6 +66,48 @@ app.get('/api/catalogo', async (req, res) => {
   }
 });
 
+// Ruta para obtener todas las provincias
+app.get('/api/catalogo_provincia', async (req, res) => {  
+  try {
+    const data = await catalogoProvinciaCantonModel.getProvincias();
+    res.json(data);
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
+});
+
+// Ruta para obtener todos los cantones de una provincia
+app.get('/api/catalogo_cantonByProvincia/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const data = await catalogoProvinciaCantonModel.getCantonesByProvincia(id);
+    res.json(data);
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
+});
+
+//////////////////////
+// Reportes Fichas //
+////////////////////
+
+// Ruta para obtener todos los registros de la tabla `ficha_predio`
+app.get('/api/ficha_predio', async (req, res) => {
+  try {
+    console.log('Fetching listado de predios...');
+    const data = await reporteFichaModel.getListadoCatastroPredio();
+    console.log('Data fetched:', data);
+    res.json(data);
+  } catch (err) {
+    console.error('Error al obtener el listado de predios:', err);
+    res.status(500).json({
+      message: 'Server Error',
+      error: err.message,
+      stack: err.stack,
+    });
+  }
+});
+
 /////////////////////////
 // CATASTRO CIUDADANO //
 ///////////////////////
@@ -79,7 +123,7 @@ app.get('/api/catastro_ciudadano', async (req, res) => {
 });
 
 // Ruta para obtener ciudadano un registro por ID
-app.get('/api/catastro_ciudadano/:id', async (req, res) => {
+app.get('/api/catastro_ciudadano_by_id/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const data = await catastroCiudadanoModel.getCatastroCiudadanoById(id);
@@ -90,7 +134,7 @@ app.get('/api/catastro_ciudadano/:id', async (req, res) => {
 });
 
 // Nueva ruta para insertar un registro en catastro_ciudadano
-app.post('/api/catastro_ciudadano', async (req, res) => {
+app.post('/api/inserta_ciudadano', async (req, res) => {
   try {
     const newRecord = await catastroCiudadanoModel.insertCatastroCiudadano(req.body);
     res.status(201).json(newRecord);
@@ -100,10 +144,19 @@ app.post('/api/catastro_ciudadano', async (req, res) => {
 });
 
 // Ruta para actualizar un registro por ID
-app.put('/api/catastro_ciudadano/:id', async (req, res) => {
+app.put('/api/actualiza_ciudadano/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const data = await catastroCiudadanoModel.updateCatastroCiudadano(id, req.body);
+    res.json(data);
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
+});
+
+app.get('/api/ciudadano_tenencia', async (req, res) => {
+  try {
+    const data = await catastroCiudadanoModel.recuperaCiudadanoTenencia();
     res.json(data);
   } catch (err) {
     res.status(500).send('Server Error');
@@ -115,7 +168,7 @@ app.put('/api/catastro_ciudadano/:id', async (req, res) => {
 /////////////////////
 
 // Ruta para insertar un registro en la tabla `catastro_predio`
-app.post('/api/catastro_predio', async (req, res) => {
+app.post('/api/inserta_catastro_predio', async (req, res) => {
   try {
     const newRecordId = await catastoPredioModel.insertCatastroPredio(req.body);
     res.status(201).json({ id: newRecordId });
@@ -126,7 +179,7 @@ app.post('/api/catastro_predio', async (req, res) => {
 });
 
 // Ruta para actualizar un registro en la tabla `catastro_predio`
-app.put('/api/catastro_predio/:id', async (req, res) => {
+app.put('/api/actualiza_catastro_predio/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const updatedRecord = await catastoPredioModel.updateCatastroPredio(id, req.body);
@@ -138,7 +191,7 @@ app.put('/api/catastro_predio/:id', async (req, res) => {
 });
 
 // Ruta para obtener un predio por ID 
-app.get('/api/catastro_predio/:id', async (req, res) => {
+app.get('/api/catastro_predio_by_id/:id', async (req, res) => {
   const id = req.params.id;
   try {
     const predio = await catastoPredioModel.getCatastroPredioById(id); 
@@ -153,12 +206,29 @@ app.get('/api/catastro_predio/:id', async (req, res) => {
   }
 });
 
+// Ruta para obtener un predio por tipo de predio
+app.get('/api/catastro_predio_by_tipo/:tipo', async (req, res) => {
+  const tipo = req.params.tipo;
+  try {
+    const predio = await catastoPredioModel.getCatastroPredioByTipo(tipo);
+    if (predio) {
+      res.json(predio);
+    } else {
+      res.status(404).send('Predio not found');
+    }
+  } catch (error) {
+    console.error('Error fetching predio:', error.message, error.stack);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 ////////////////////////
 // CATASTRO TENENCIA //
 //////////////////////
 
 // Ruta para grabar los registros de la tabla `catastro_tenencia`
-app.post('/api/catastro_tenencia', async (req, res) => {  
+app.post('/api/inserta_tenencia', async (req, res) => {  
   try {
     const newRecordId = await catastroTenenciaModel.insertCatastroTenencia(req.body);
     res.status(201).json(newRecordId);
@@ -169,7 +239,7 @@ app.post('/api/catastro_tenencia', async (req, res) => {
 });
 
 // Ruta para actualizar un registro de la tabla `catastro_tenencia` basado en su ID
-app.put('/api/catastro_tenencia/:id', async (req, res) => {
+app.put('/api/actualiza_tenencia/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const updatedRecord = await catastroTenenciaModel.updateCatastroTenencia(id, req.body);
@@ -181,10 +251,26 @@ app.put('/api/catastro_tenencia/:id', async (req, res) => {
 });
 
 // Ruta para obtener un registro de la tabla `catastro_tenencia` basado en su ID
-app.get('/api/catastro_tenencia/:id', async (req, res) => {
+app.get('/api/tenencia_by_id/:id', async (req, res) => {
   const id = req.params.id;
   try {
     const tenencia = await catastroTenenciaModel.getCatastroTenenciaById(id);
+    if (tenencia) {
+      res.json(tenencia);
+    } else {
+      res.status(404).send('Tenencia not found');
+    }
+  } catch (error) {
+    console.error('Error fetching tenencia:', error.message, error.stack);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Ruta para obtener todos los registros de la tabla `catastro_tenencia`
+app.get('/api/tenencia_by_predio/:predio', async (req, res) => {
+  const predio = req.params.predio;
+  try {
+    const tenencia = await catastroTenenciaModel.getListadoTenenciaByPredio(predio);
     if (tenencia) {
       res.json(tenencia);
     } else {
@@ -213,20 +299,6 @@ app.get('/api/geo_consultas/area_predio/:codCat', async (req, res) => {
     res.status(500).send('Server Error');
   }  
     
-});
-
-//////////////////////
-// Reportes Fichas //
-////////////////////
-
-// Ruta para obtener todos los registros de la tabla `ficha_predio`
-app.get('/api/ficha_predio', async (req, res) => {
-  try {
-    const data = await reporteFichaModel.getListadoCatastroPredio();
-    res.json(data);
-  } catch (err) {
-    res.status(500).send('Server Error');
-  }
 });
 
 //////////////////
@@ -307,6 +379,7 @@ app.get('/api/fitto_corvini', async (req, res) => {
 
 
 // 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

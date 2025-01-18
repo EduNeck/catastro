@@ -6,9 +6,9 @@
       </v-col>
       <!-- Botones -->
       <v-col cols="12" class="d-flex justify-center flex-wrap">
-        <v-btn class="btn_app mx-2 my-2" append-icon="mdi-plus">Nuevo</v-btn>
-        <v-btn class="btn_app mx-2 my-2" append-icon="mdi-check">Guardar</v-btn>
-        <v-btn class="btn_app mx-2 my-2" append-icon="mdi-pencil">Actualizar</v-btn>
+        <v-btn class="btn_app mx-2 my-2" append-icon="mdi-plus" @click="nuevoRegistro">Nuevo</v-btn>
+        <v-btn class="btn_app mx-2 my-2" append-icon="mdi-check" @click="guardar" :disabled="isUpdateMode">Guardar</v-btn>
+        <v-btn class="btn_app mx-2 my-2" append-icon="mdi-pencil" @click="actualizar" :disabled="!isUpdateMode">Actualizar</v-btn>
         <v-btn class="btn_app mx-2 my-2" append-icon="mdi-download">Imp. Ficha</v-btn>
         <v-btn class="btn_app mx-2 my-2" append-icon="mdi-file">Valorar</v-btn>
         <v-btn class="btn_app mx-2 my-2" append-icon="mdi-close" @click="navigateToMenuUrbano">Salir</v-btn>
@@ -31,15 +31,21 @@
         <v-row>
           <v-col cols="12" sm="6" md="2">
             <v-select 
-              label="Tipo Predio" v-model="form.id_tipo_predio" :items="tipoPredios"
-              item-text="descripcion" item-value="id" required   >
+              label="Tipo Predio"   
+              v-model="form.id_tipo_predio"             
+              :items="tipoPredios"
+              item-text="descripcion"
+              item-value="id"
+              required>
             </v-select>
           </v-col>
 
           <v-col cols="12" sm="6" md="3">                
             <v-select 
               label="Regimen de Propiedad" 
-              v-model="form.id_regimen_propiedad"  item-text="descripcion" 
+              v-model="form.id_regimen_propiedad"  
+              :items="regimens"
+              item-text="descripcion" 
               item-value="id" 
               required >
             ></v-select>
@@ -59,7 +65,7 @@
         </v-row>
       </v-card-text>
     </v-card>   
-    <!-- Segundo Bloque -->
+    <!-- Segundo Bloque Clave Catastral-->
     <v-card class="block-color fill-width">
       <v-card-title class="centered-title">CLAVE CATASTRAL</v-card-title>
       <v-card-text>
@@ -73,15 +79,19 @@
 
           <v-col cols="12" sm="6" md="3">
             <v-select
-              label="Parroquia" v-model="form.id_par" :items="formattedParroquias"
-              item-text="descripcion" item-value="dpa" required @input="updateClaveCatastral">
+              label="Parroquia" 
+              v-model="form.id_par" 
+              :items="formattedParroquias"
+              item-text="descripcion" 
+              item-value="dpa" 
+              required 
+              @input="updateClaveCatastral">
             </v-select>
           </v-col>
 
           <v-col cols="12" sm="6" md="1">
             <v-text-field
-              label="Zona"
-              color="#F2AA1F"
+              label="Zona"              
               v-model="form.cod_zon"
               type="number"
               :rules="[v => !!v && v >= 1 && v <= 9 || 'Debe ser un número entre 1 y 9']"
@@ -91,8 +101,7 @@
           </v-col>
           <v-col cols="12" sm="6" md="1">
             <v-text-field
-              label="Sector"
-              color="#F2AA1F"
+              label="Sector"              
               v-model="form.cod_sec"
               type="number"
               :rules="[v => !!v && v >= 1 && v <= 9 || 'Debe ser un número entre 1 y 9']"
@@ -102,8 +111,7 @@
           </v-col>
           <v-col cols="12" sm="6" md="1">
             <v-text-field
-              label="Pol/Manzana"
-              color="#F2AA1F"
+              label="Pol/Manzana"              
               v-model="form.cod_pol_man"
               type="number"
               :rules="[v => !!v && v >= 1 && v <= 999 || 'Debe ser un número entre 1 y 999']"
@@ -113,8 +121,7 @@
           </v-col>          
           <v-col cols="12" sm="6" md="1" >
             <v-text-field
-              label="Predio"
-              color="#F2AA1F"
+              label="Predio"              
               v-model="form.cod_pred"
               type="number"
               :rules="[v => !!v && v >= 1 && v <= 999 || 'Debe ser un número entre 1 y 999']"
@@ -125,15 +132,14 @@
       </v-row> 
       </v-card-text> 
     </v-card>     
-    <!-- Tercer Bloque -->
+    <!-- Tercer Bloque Ph -->
     <v-card class="mb-3 block-color fill-width" v-if="form.id_regimen_propiedad === 4">
       <v-card-title class="centered-title">PROPIEDAD HORIZONTAL</v-card-title>
       <v-card-text>
         <v-row>
           <v-col cols="12" sm="6" md="2" v-if="form.id_regimen_propiedad === 4"> 
               <v-text-field 
-                label="Unidad" 
-                color="#F2AA1F" 
+                label="Unidad"                  
                 v-model="form.cod_uni"               
                 type="number"
                 :rules="[v => !!v && v >= 0 && v <= 999 || 'Debe ser un número entre 0 y 999']"
@@ -142,8 +148,7 @@
             </v-col> 
             <v-col cols="12" sm="6" md="2" v-if="form.id_regimen_propiedad === 4"> 
               <v-text-field 
-                label="Bloque" 
-                color="#F2AA1F" 
+                label="Bloque"                  
                 v-model="form.cod_bloq"
                 type="number"
                 :rules = "[v => !!v && v >= 0 && v <= 999 || 'Debe ser un número entre 0 y 999']"
@@ -153,14 +158,13 @@
             <v-col cols="12" sm="6" md="2" v-if="form.id_regimen_propiedad === 4"> 
               <v-select
               label="Tipo de Piso" v-model="form.id_tipo_piso" :items="tipoPisos" 
-              item-text="descripcion" item-value="id" required color="#F2AA1F" 
+              item-text="descripcion" item-value="id" required  
               @input="updateClaveCatastral">
             </v-select> 
             </v-col> 
             <v-col cols="12" sm="6" md="2" v-if="form.id_regimen_propiedad === 4"> 
               <v-text-field 
-                label="Piso" 
-                color="#F2AA1F" 
+                label="Piso"                  
                 v-model="form.cod_piso"
                 type="number"
                 :rules = "[v => !!v && v >= 0 && v <= 99 || 'Debe ser un número entre 0 y 99']"
@@ -170,31 +174,29 @@
         </v-row>
       </v-card-text>
     </v-card>
-
-    <!-- Tercer Bloque -->
+    <!-- Cuarto Bloque Areas -->
     <v-card class="mb-3 block-color fill-width" v-if="form.id_regimen_propiedad === 4">
       <v-card-title class="centered-title">ÁREAS</v-card-title>
       <v-card-text>
         <v-row>
           <v-col cols="12" sm="6" md="2">
-            <v-text-field label="Alicuota" 
-             color = #F2AA1F 
+            <v-text-field 
+             label="Alicuota"                          
              v-model="form.alicuota" 
              type="number"
              >
             </v-text-field>
           </v-col>
           <v-col cols="12" sm="6" md="2">
-            <v-text-field label="Área de Terreno" 
-             color = #F2AA1F 
+            <v-text-field 
+             label="Área de Terreno" 
              v-model="form.area_terreno" 
              type="number" 
              >
             </v-text-field>
           </v-col>
           <v-col cols="12" sm="6" md="2">
-            <v-text-field label="Área Común de Terreno" 
-             color = #F2AA1F 
+            <v-text-field label="Área Común de Terreno"               
              v-model="form.area_comun_terreno" 
              type="number"
               >
@@ -207,7 +209,7 @@
               v-model="form.id_unidad_area" 
               item-text="descripcion" 
               item-value="id" 
-              required color="#F2AA1F"
+              required 
             ></v-select>
           </v-col>          
           <v-col cols="12" sm="6" md="2">
@@ -228,9 +230,8 @@
           </v-col>
         </v-row>
       </v-card-text>
-    </v-card>  
-
-     <!-- Cuarto Bloque -->
+    </v-card> 
+     <!-- Quito Bloque Ejes Viales-->
     <v-card class="mb-3 block-color">
       <v-card-title class="centered-title">EJES VIALES</v-card-title>
       <v-card-text>
@@ -267,15 +268,12 @@
 
 <script>
 import axios from 'axios';
+import { mapActions } from 'vuex';
 
 export default {
-  // Nombre del componente
   name: 'TabIdentificacion',
-
   data() {    
     return {      
-      isWindowVisible: true,
-      
       form: {
         id_predio: null, 
         id_tipo_predio: '',
@@ -311,15 +309,19 @@ export default {
       unidadAreas: [],
       parroquias: [],
       idPredio: null,
-     };     
+
+      isWindowVisible: true,
+
+     };
   },
 
   // Crea el componente Id del predio
   created() {
     const idPredio = this.$route.query.id_predio;
-    console.log('ID del predio recibido:', idPredio);
+    console.log('ID DEL PREDIO RECIBIDO:', idPredio);
     if (idPredio) {
       this.id_predio = idPredio;
+      this.updateIdPredio(idPredio);// setea variable global
       this.fetchPredio(idPredio);
     }
   },
@@ -328,13 +330,17 @@ export default {
     // Cargar catálogos
     try {
       console.log('Componente montado');
-      this.tipoPredios = await this.fetchCatalogo(1); // Obtén los datos para el tipo de persona
+      this.tipoPredios = await this.fetchCatalogo(1); // Obtén los datos para el tipo de predio      
       this.regimens = await this.fetchCatalogo(2); // Obtén los datos para el tipo de persona
       this.tipoPisos = await this.fetchCatalogo(3); // Obtén los datos para el tipo de persona
       this.unidadAreas = await this.fetchCatalogo(8); // Obtén los datos para el tipo de area
       this.parroquias = await this.fetchParroquia(); // Obtén los datos para el tipo de persona
-      console.log('Datos del catálogo cargados:', this.tipoPredios, this.regimens, this.tipoPisos);
-      console.log('Datos de parroquias cargados:', this.parroquias);
+      console.log('Datos del catálogo cargados:', 
+      this.tipoPredios, 
+      this.regimens, 
+      this.tipoPisos);
+      console.log('Datos de parroquias cargados:', 
+      this.parroquias);
     } catch (error) {
       console.error('Error al montar el componente:', error);
     }    
@@ -342,12 +348,14 @@ export default {
   
   // Cancatenar descripción de parroquia
   computed: {
+
     formattedParroquias() {
       return this.parroquias.map(parroquia => ({
         ...parroquia,
         descripcion: `${parroquia.dpa} - ${parroquia.descripcion}`
       }));
     },
+
     isUpdateMode() {
       return this.idPredio !== null;
     }
@@ -355,29 +363,62 @@ export default {
 
   // Métodos del componente
   methods: {
+    ...mapActions(['updateIdPredio']),
+
     // Obtener parroquia
     async fetchParroquia() {
       try {
         const response = await axios.get('http://localhost:3001/api/catastro_parroquia');
-        return response.data;
+        console.log('Datos obtenidos para parroquia:', response.data);       
+        if (Array.isArray(response.data)) {
+          return response.data.map(item => {
+            if (item.dpa && item.descripcion) {
+              return {
+                ...item,
+                tipoNombre: `${item.dpa} - ${item.descripcion}`,
+                title: `${item.dpa} - ${item.descripcion}`,
+                id: item.id
+              };
+            } else {
+              console.warn('Elemento con datos incompletos:', item);
+              return null;
+            }
+          }).filter(item => item !== null); 
+        } else {
+          throw new Error('La respuesta de la API no es un array');
+        }
       } catch (error) {
         console.error('Error fetching parroquia:', error);
         return [];
       }
     },
-    // Obtener catálogo
+
     async fetchCatalogo(id_tipo_atributo) {
       try {
         const response = await axios.get('http://localhost:3001/api/catalogo', {
           params: { id_tipo_atributo }
         });
         console.log(`Datos obtenidos para id_tipo_atributo ${id_tipo_atributo}:`, response.data);
-        return response.data;
+        
+        if (Array.isArray(response.data)) {
+          // Eliminar duplicados basados en el campo 'id'
+          const uniqueData = response.data.filter((item, index, self) =>
+            index === self.findIndex((t) => t.id === item.id)
+          );
+          return uniqueData.map(item => ({
+            ...item,
+            tipoNombre: item.descripcion, // Crea la propiedad `tipoNombre`
+            title: item.descripcion        // Crea la propiedad `title`
+          }));
+        } else {
+          throw new Error('La respuesta de la API no es un array');
+        }
       } catch (error) {
         console.error('Error fetching catalogo:', error);
         throw new Error('No se pudo obtener el catálogo');
       }
     },
+
 
     // Obtener área del predio
     async fetchAreaPredio() {
@@ -391,7 +432,7 @@ export default {
         const response = await axios.get(`http://localhost:3001/api/geo_consultas/area_predio/${claveCatastral}`);
         const areaPredio = response.data;
         console.log('Área del predio recuperada:', areaPredio);
-        this.form.area_grafica = areaPredio.area; // Asigna el área recuperada al campo "area_grafica"
+        this.form.area_grafica = areaPredio.area;
         console.log('Área gráfica asignada:', this.form.area_grafica);
       } catch (error) {
         console.error('Error fetching area del predio:', error);
@@ -439,29 +480,27 @@ export default {
         nuevoPredio.alicuota = null;
         nuevoPredio.area_terreno = null;
         nuevoPredio.area_comun_terreno = null;
-        nuevoPredio.id_unidad_area = null;
+        nuevoPredio.id_unidad_area = 22;
         nuevoPredio.area_individual_construida = null;
         nuevoPredio.area_comun_construida = null;
       }
-
       console.log('Datos a guardar:', nuevoPredio);
-
       try {
-        const response = await axios.post('http://localhost:3001/api/catastro_predio', nuevoPredio);
-        const idPredio = response.data.id;
-        console.log('ID del nuevo registro:', idPredio);
-        alert('Predio guardado exitosamente');
-        // Aquí puedes usar newRecordId como clave foránea para los siguientes recursos
+        const response = await axios.put(`http://localhost:3001/api/inserta_catastro_predio/${this.id_predio}`, nuevoPredio);
+        console.log('Identificación actualizada:', response.data);
+        this.snackbarMessage = 'Datos actualizada exitosamente';
+        this.snackbar = true;
       } catch (error) {
-        console.error('Error al guardar el predio:', error);
-        alert(`Error al guardar el predio: ${error.response.data.detail}`);
+        console.error('Error al actualizar la identificación:', error);
+        this.snackbarMessage = 'Error al actualizar la identificación';
+        this.snackbar = true;
       }
     },
 
     // Actualizar formulario
     async actualizar() {
       console.log('Actualizando identificación');
-      const identificacion = {
+      const detalle_json = {
         id_tipo_predio: this.form.id_tipo_predio,
         id_regimen_propiedad: this.form.id_regimen_propiedad,
         clave_catastral_anterior: this.form.clave_catastral_anterior,
@@ -477,11 +516,37 @@ export default {
         eje_secundario: this.form.eje_secundario,
         sector: this.form.sector
       };
+
+      if (this.form.id_regimen_propiedad === 4) {
+        // Si el régimen de propiedad es PROPIEDAD HORIZONTAL - PH (código 4)
+        detalle_json.cod_uni = this.form.cod_uni;
+        detalle_json.cod_bloq = this.form.cod_bloq;
+        detalle_json.id_tipo_piso = this.form.id_tipo_piso;
+        detalle_json.cod_piso = this.form.cod_piso;
+        detalle_json.alicuota = this.form.alicuota;
+        detalle_json.area_terreno = this.form.area_terreno;
+        detalle_json.area_comun_terreno = this.form.area_comun_terreno;
+        detalle_json.id_unidad_area = this.form.id_unidad_area;
+        detalle_json.area_individual_construida = this.form.area_individual_construida;
+        detalle_json.area_comun_construida = this.form.area_comun_construida;
+      } else {
+        // Si el régimen de propiedad no es PROPIEDAD HORIZONTAL - PH (código 4)
+        detalle_json.cod_uni = 0;
+        detalle_json.cod_bloq = 0;
+        detalle_json.id_tipo_piso = 5;
+        detalle_json.cod_piso = 0;
+        detalle_json.alicuota = null;
+        detalle_json.area_terreno = null;
+        detalle_json.area_comun_terreno = null;
+        detalle_json.id_unidad_area = 22;
+        detalle_json.area_individual_construida = null;
+        detalle_json.area_comun_construida = null;
+      }
     
-      console.log('Datos a actualizar:', identificacion);
+      console.log('Datos a actualizar:', JSON.stringify(detalle_json, null, 2));
 
       try {
-        const response = await axios.put(`http://localhost:3001/api/catastro_predio/${this.id_predio}`, identificacion);
+        const response = await axios.put(`http://localhost:3001/api/actualiza_catastro_predio/${this.id_predio}`, detalle_json);
         console.log('Identificación actualizada:', response.data);
         this.snackbarMessage = 'Datos actualizada exitosamente';
         this.snackbar = true;
@@ -492,21 +557,31 @@ export default {
       }
     },
 
-    // Limpiar Campos
-    limpiarCampos() {
+     // Limpiar Campos
+     limpiarCampos() {
       console.log('Limpiando campos');
-      this.id_predio = null;
+      this.form.id_predio = null;
+      this.form.id_tipo_predio = '';
+      this.form.id_regimen_propiedad = '';
+      this.form.clave_catastral_anterior = '';
+      this.form.clave_catastral = '';
+      this.form.id_prov = '17';
+      this.form.id_can = '1702';
+      this.form.id_par = '';
+      this.form.cod_zon = '';
+      this.form.cod_sec = '';
+      this.form.cod_pol_man = '';
+      this.form.cod_pred = '';
+      this.form.cod_uni = '';
+      this.form.cod_bloq = '';
+      this.form.id_tipo_piso = '';
+      this.form.cod_piso = '';
       this.form.alicuota = '';
       this.form.area_terreno = '';
       this.form.area_comun_terreno = '';
       this.form.id_unidad_area = '';
       this.form.area_individual_construida = '';
       this.form.area_comun_construida = '';
-      this.form.cod_pred = '';
-      this.form.cod_uni = '';
-      this.form.cod_bloq = '';
-      this.form.id_tipo_piso = '';
-      this.form.cod_piso = '';
       this.form.eje_principal = '';
       this.form.eje_secundario = '';
       this.form.sector = '';
@@ -520,9 +595,10 @@ export default {
       }
     },
 
+    // Obtener predio
     async fetchPredio(idPredio) {
       try {
-        const response = await axios.get(`http://localhost:3001/api/catastro_predio/${idPredio}`);
+        const response = await axios.get(`http://localhost:3001/api/catastro_predio_by_id/${idPredio}`);
         const predio = response.data;
         console.log('Datos del predio:', predio);
         this.form = {
@@ -559,23 +635,28 @@ export default {
       }
     },
 
+    nuevoRegistro() {
+      this.idPredio = null;
+      this.limpiarCampos();
+    },
+
     // Actualizar clave catastral
     updateClaveCatastral() {
       const { id_par, cod_zon, cod_sec, cod_pol_man, cod_pred, 
         id_regimen_propiedad, cod_uni, cod_bloq, id_tipo_piso, cod_piso } = this.form;
 
       // Asegurarse de que los campos manzana y predio sean de 3 dígitos
-      const formattedCodPolMan = cod_pol_man ? cod_pol_man.padStart(3, '0') : '';
-      const formattedCodPred = cod_pred ? cod_pred.padStart(3, '0') : '';
+      const formattedCodPolMan = cod_pol_man ? String(cod_pol_man).padStart(3, '0') : '';
+      const formattedCodPred = cod_pred ? String(cod_pred).padStart(3, '0') : '';
 
       if (id_regimen_propiedad !== 4) {
         // Si el régimen de propiedad no es PROPIEDAD HORIZONTAL - PH (código 4)
         this.form.clave_catastral = `${id_par}${cod_zon}${cod_sec}${formattedCodPolMan}${formattedCodPred}000000P00`;
       } else {
         // Si el régimen de propiedad es PROPIEDAD HORIZONTAL - PH (código 4)
-        const formattedCodUni = cod_uni ? cod_uni.padStart(3, '0') : '';
-        const formattedCodBloq = cod_bloq ? cod_bloq.padStart(3, '0') : '';
-        let formattedCodPiso = cod_piso ? cod_piso.padStart(2, '0') : '';
+        const formattedCodUni = cod_uni ? String(cod_uni).padStart(3, '0') : '';
+        const formattedCodBloq = cod_bloq ? String(cod_bloq).padStart(3, '0') : '';
+        let formattedCodPiso = cod_piso ? String(cod_piso).padStart(2, '0') : '';
 
         if (id_tipo_piso === 5) {
           // Si el tipo de piso es PISO (código 5)
@@ -593,6 +674,7 @@ export default {
     navigateToMenuUrbano() {
       this.$router.push('/menu-urbano');
     },
+
     // Valida si el régimen de propiedad es propiedad horizontal
     handleRegimenChange() {
       if (this.form.id_regimen_propiedad !== 4) {
@@ -600,6 +682,7 @@ export default {
       }
     },
 
+    // Alternar visibilidad de la ventana
     toggleWindow() {
       this.isWindowVisible = !this.isWindowVisible; // Alterna la visibilidad del v-window
     },
@@ -684,6 +767,4 @@ export default {
 .large-text {
   font-size: 1.2em;
 }
-
-
 </style>

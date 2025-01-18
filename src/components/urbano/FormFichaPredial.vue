@@ -7,10 +7,17 @@
     </v-tabs>
 
     <!-- Tabs -->
-    <v-window v-model="tab" show-arrows>
+    <!-- <v-window v-model="tab" show-arrows> -->
+    <v-window v-model="tab">
+
       <v-window-item :value="0">
-        <TabIdentificacion />        
+        <TabIdentificacion/>        
       </v-window-item> 
+
+      <v-window-item :value="1">
+        <VentanaTenencia/>
+      </v-window-item>  
+
     </v-window>
 
   </v-container>
@@ -18,6 +25,8 @@
 
 <script>
 import TabIdentificacion from './TabIdentificacion.vue';
+import VentanaTenencia from './VentanaTenencia.vue';
+
 
 export default {
   name: 'FormFichaPredial',
@@ -39,6 +48,8 @@ export default {
   },
   components: {
     TabIdentificacion,
+
+    VentanaTenencia,
   },
 };
 </script>
