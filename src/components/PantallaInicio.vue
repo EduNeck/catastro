@@ -12,25 +12,34 @@
       
       <v-col class="mb-4">
         <h1 class="display-2 font-weight-bold mb-3">
-          GADM Gobierno Autónomo Descentralizado Intercultural y Plurinacional del Municipio de Cayambe
+          {{ organizationName }}
         </h1>  
       </v-col>  
       <v-col cols="12">
-        <v-btn color="primary" @click="$router.push('/login')">INGRESO</v-btn>
+        <v-btn color=#383838 @click="$router.push('/login')">INGRESO</v-btn>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
+
+import { textVariables } from '@/config/textVariables';
+
 export default {
-  name: 'PantallaInicio'
+  name: 'PantallaInicio',
+  data() {
+    return {
+      organizationName: textVariables.organizationName
+    }
+  }
 };
+
 </script>
 
 <style scoped>
 h1 {
-  color: #3f51b5;
-  font-size: 2vw; /* Ajusta el tamaño de fuente según el ancho de la ventana */
+  color: #ffffff;
+  font-size: 2vw; 
 }
 </style>
