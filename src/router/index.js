@@ -21,7 +21,7 @@ const routes = [
   { path: '/visor-geo', component: VisorGeo },
   { path: '/ficha-predial-urb', component: FormFichaPredial},
   { path: '/tab-identificacion-urb', component: TabIdentificacion},
-  { path: '/tab-tenencia-urb', component: TabTenencia},
+  { path: '/tab-tenencia-urb', name: 'TabTenencia', component: TabTenencia},
   { path: '/tab-list-tenencia-urb', component: TabListadoTenencia},
   { path: '/listado-predios-urb', component: ListadoPrediosUrbanos},
 

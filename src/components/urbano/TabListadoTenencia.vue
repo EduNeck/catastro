@@ -4,6 +4,7 @@
       <v-col cols="12" class="text-center">
         <h2 class="titulo-pantalla">Listado de Tenencias</h2>
       </v-col>
+
       <v-row>
         <v-col cols="12">
           <v-data-table
@@ -16,6 +17,11 @@
               <v-toolbar flat>
                 <v-toolbar-title>Tenencias</v-toolbar-title>
                 <v-divider class="mx-4" inset vertical></v-divider>
+                <v-spacer></v-spacer>                
+                <v-col cols="auto">
+                  <v-btn class="custom-text-color" color="#114358" @click="recargarDatos">Recargar Datos</v-btn>
+                </v-col>
+                <v-divider class="mx-4" inset vertical></v-divider>
                 <v-spacer></v-spacer>
                 <v-text-field
                   v-model="search"
@@ -27,7 +33,10 @@
               </v-toolbar>
             </template>
             <template v-slot:item="{ item }">
-              <tr>
+              <tr :class="{ 'selected-row': item.id_tenencia === selectedTenenciaId }">
+                <v-btn color="#F1ECE7" icon @click="selectTenencia(item.id_tenencia)">
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
                 <td>{{ item.id_tenencia }}</td>
                 <td>{{ item.nombres }}</td>
                 <td>{{ item.numero_documento }}</td>
@@ -37,9 +46,6 @@
                 <td>{{ item.porcentaje_participacion }}%</td>
                 <td>{{ item.regimen_propiedad }}</td>
                 <td>
-                  <v-btn icon @click="selectTenencia(item)">
-                    <v-icon>mdi-pencil</v-icon>
-                  </v-btn>
                 </td>
               </tr>
             </template>
@@ -52,7 +58,7 @@
 
 <script>
 import axios from 'axios';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'TabListadoTenencia',
@@ -61,7 +67,9 @@ export default {
     return {
       search: '',
       tenencias: [],
+      selectedTenenciaId: null,
       headers: [
+        { text: 'Acción', value: 'action', sortable: false },
         { text: 'ID Tenencia', value: 'id_tenencia' },
         { text: 'Nombres', value: 'nombres' },
         { text: 'Número de Documento', value: 'numero_documento' },
@@ -69,8 +77,7 @@ export default {
         { text: 'Forma de Propiedad', value: 'forma_propiedad' },
         { text: 'Tipo de Persona', value: 'tipo_persona' },
         { text: 'Porcentaje de Participación', value: 'porcentaje_participacion' },
-        { text: 'Régimen de Propiedad', value: 'regimen_propiedad' },
-        { text: 'Acción', value: 'action', sortable: false }
+        { text: 'Régimen de Propiedad', value: 'regimen_propiedad' }        
       ]
     };
   },
@@ -82,7 +89,7 @@ export default {
   async mounted() {
     try {
       console.log('Componente montado');
-      console.log('ID DEL PREDIO TENENCIA:', this.getIdPredio);
+      console.log('ID DEL PREDIO:', this.getIdPredio);
       await this.fetchTenencias(this.getIdPredio);
     } catch (error) {
       console.error('Error al montar el componente:', error);
@@ -90,6 +97,20 @@ export default {
   },
 
   methods: {
+    
+    ...mapActions(['updateIdTenencia']), 
+
+    // Método para recargar los datos de la tabla
+    async recargarDatos() {
+      try {
+        console.log('Recargando datos...');
+        await this.fetchTenencias(this.getIdPredio);
+      } catch (error) {
+        console.error('Error al recargar los datos:', error);
+      }
+    },
+
+    // Método para obtener las tenencias de un predio
     async fetchTenencias(idPredio) {
       try {
         if (!idPredio || idPredio.trim() === '') {
@@ -103,9 +124,9 @@ export default {
       }
     },
 
-    selectTenencia(tenencia) {
-      // Lógica para manejar la selección de la tenencia
-      console.log('Tenencia seleccionada:', tenencia);
+    selectTenencia(id_tenencia) {
+      this.$store.dispatch('updateIdTenencia', id_tenencia);
+      this.$emit('navigateToTenencia'); // Emitir el evento para navegar
     },
   }
 };
@@ -125,8 +146,12 @@ export default {
   color: black !important;
 }
 
-/* Añadir estilo para el botón si es necesario */
 .v-btn {
-  margin-bottom: 10px; /* Asegúrate de que el botón no esté pegado a otro componente */
+  margin-bottom: 10px;
+}
+
+.selected-row {
+  background-color: #114358; 
+  color: white;
 }
 </style>

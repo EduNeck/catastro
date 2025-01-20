@@ -1,9 +1,9 @@
 <template>
-  <v-window v-model="window" show-arrows>
+  <v-window v-model="window" show-arrows arrows-color="red">
     <v-window-item value="listado-tenencia">
-      <TabListadoTenencia/>
+      <TabListadoTenencia @navigateToTenencia="navigateToTenencia"/>
     </v-window-item>
-    <v-window-item value="tab-tenencia">
+    <v-window-item :key="tabTenenciaKey" value="tab-tenencia">
       <TabTenencia/>
     </v-window-item>
   </v-window>
@@ -19,6 +19,7 @@ export default {
   data() {
     return {
       window: 'listado-tenencia',
+      tabTenenciaKey: 0, // Añadir una clave para TabTenencia
     };
   },
   components: {
@@ -31,6 +32,10 @@ export default {
   methods: {
     toggleTabTenencia() {
       this.window = this.window === 'listado-tenencia' ? 'tab-tenencia' : 'listado-tenencia';
+    },
+    navigateToTenencia() {
+      this.tabTenenciaKey += 1; // Cambiar la clave para recargar el componente
+      this.window = 'tab-tenencia';
     }
   }
 };

@@ -15,7 +15,7 @@ const getAllCatastroCiudadano = async () => {
 
 // Función para obtener un registro por ID
 const getCatastroCiudadanoById = async (id) => {
-  const query = 'SELECT * FROM public.catastro_ciudadano WHERE id_ciudadano = $1';
+  const query = 'SELECT id_ciudadano, nombres, numero_documento FROM public.catastro_ciudadano WHERE id_ciudadano = $1';
   try {
     const result = await db.query(query, [id]);
     return result.rows[0];

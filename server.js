@@ -282,6 +282,22 @@ app.get('/api/tenencia_by_predio/:predio', async (req, res) => {
   }
 });
 
+// Ruta para obtener un registro de la tabla `catastro_tenencia` basado en su ID
+app.get('/api/tenencia_by_id/:id  ', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const tenencia = await catastroTenenciaModel.getTenenciaById(id);
+    if (tenencia) {
+      res.json(tenencia);
+    } else {
+      res.status(404).send('Tenencia not found');
+    }
+  } catch (error) {
+    console.error('Error fetching tenencia:', error.message, error.stack);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 ////////////////////
 // Geo Consultas //
 //////////////////

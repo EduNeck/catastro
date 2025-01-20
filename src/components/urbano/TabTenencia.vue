@@ -4,8 +4,10 @@
       <v-col cols="12" class="text-center">
         <h2 class="titulo-pantalla">TENENCIA PROPIEDAD</h2>
       </v-col>
-      <v-col cols="auto" class="d-flex justify-center"> 
-        <v-btn class="btn_app mx-2 custom-text-color" @click="guardar">Guardar</v-btn>
+      <v-col cols="auto" class="d-flex justify-center">         
+        <v-btn class="btn_app mx-2 custom-text-color" @click="nuevo" :disabled="!getIdPredio">Nuevo</v-btn>
+        <v-btn class="btn_app mx-2 custom-text-color" @click="guardar" :disabled="!getIdPredio || !!id_tenencia">Guardar</v-btn>
+        <v-btn class="btn_app mx-2 custom-text-color" @click="actualizaTenencia" :disabled="!id_tenencia">Actualizar</v-btn>
       </v-col>
     </v-row>              
     <!-- Primer y Segundo Bloque juntos en horizontal -->
@@ -118,7 +120,7 @@
               :items="provincias"
               item-text="title"
               item-value="id"
-              label="Seleccione una provincia"
+              label="Provincia"
               @click="onProvinciaProto"
             ></v-select>
           </v-col>
@@ -127,7 +129,7 @@
             <v-select
               :items="cantones" 
               label="Cantón" 
-              v-model="form.id_canton" 
+              v-model="form.id_can_protocol" 
               item-text="title" 
               item-value="id" 
               required
@@ -150,11 +152,23 @@
           </v-col>
           
           <v-col cols="12" sm="6" md="2">
-            <v-text-field label="Área" 
+            <v-text-field label="Área Registro" 
               v-model="form.area_registro" 
               type="number" >
             </v-text-field>
           </v-col>
+
+          <v-col cols="12" sm="6" md="2">
+            <v-select 
+              :items="unidadAreas" 
+              label="Unidad" 
+              v-model="form.id_unidad" 
+              item-text="descripcion"
+              item-value="id"
+              required>
+            </v-select>
+          </v-col>
+
 
         </v-row>
       </v-card-text>
@@ -168,22 +182,22 @@
 
           <v-col cols="12" sm="6" md="2">                  
             <v-select               
-              label="Provincia Registro"   
+              label="Provincia"   
               :items="provincias"               
               v-model="form.id_provincia" 
-              item-text="descripcion" 
-              item-value="dpa"   
+              item-text="title" 
+              item-value="id"   
               @click="onProvinciaRegistro"             
             ></v-select>
           </v-col>
 
           <v-col cols="12" sm="6" md="2">
             <v-select               
-              label="Cantón Registro" 
-              :items="cantones"
+              label="Cantón" 
+              :items="cantonesReg"
               v-model="form.id_canton" 
-              item-text="name" 
-              item-value="value" 
+              item-text="title" 
+              item-value="id" 
               @click="onProvinciaRegistro"
             ></v-select>
           </v-col>
@@ -251,13 +265,6 @@
         </v-row>
       </v-card-text>
     </v-card>
-
-    <v-row justify="center">
-      <v-col cols="auto">
-        <v-btn class="custom-text-color" color="#114358" @click="guardar">Guardar</v-btn>
-      </v-col>
-    </v-row>
-
   </v-container>
 </template>
 
@@ -299,8 +306,12 @@ export default {
       items: ['SI', 'NO'],
       provincias: [],
       cantones: [],
+      cantonesReg: [],
       formaPropiedad: [],
       ciudadanoTenencia: [],
+      unidadAreas: [],
+      id_predio: null, 
+      id_tenencia: null,
     }
   },
 
@@ -311,64 +322,134 @@ export default {
         value: item.value 
       })); 
     },
-    ...mapGetters(['getIdPredio']),    
+    ...mapGetters(['getIdPredio', 'getIdTenencia']),    
   },
 
   async mounted() {
-    // Cargar listados Provincias
-    await this.fetchProvincias();
-    
-    // Cargar Ciudadano
+    // Validar idPredio
+    if (!this.getIdPredio) {
+      console.error(`idPredio (${this.getIdPredio}) no está definido`);
+      alert(`idPredio (${this.getIdPredio}) no está definido`);
+      return;
+    }
+
+    // Montar idPredio e idTenencia
+    this.id_predio = this.getIdPredio;
+    this.id_tenencia = this.getIdTenencia;
+    console.log('ID DEL PREDIO:', this.id_predio);
+    console.log('ID DE LA TENENCIA:', this.id_tenencia);
+
+    // Cargar datos de la tenencia si existe id_tenencia
+    if (this.id_tenencia) {
+      await this.cargarDatosTenencia(this.id_tenencia);
+    }
+
+    // Monta el listados Provincias
+    await this.fetchProvincias();   
+
+    // Monta el Ciudadano
     try {
       console.log('Componente Ciudadano montado');
-      this.ciudadano = await this.fetchCiudadanoTenencia();    
-      console.log('Datos del Ciudadano cargados:',this.ciudadanoTenencia, );
+      this.ciudadanoTenencia = await this.fetchCiudadanoTenencia();    
+      console.log('Datos del Ciudadano cargados:', this.ciudadanoTenencia);
     } catch (error) {
-      console.error('Error al montar el ciudano:', error);
+      console.error('Error al montar el ciudadano:', error);
     }
-    
-    // Cargar Catalogo
+
+    // Monta el Catalogo
     try {
       console.log('Componente Catalogo montado');
       this.formaPropiedad = await this.fetchCatalogo(20);    
-      console.log('Forma Propiedad:',this.formaPropiedad, );
+      this.unidadAreas = await this.fetchCatalogo(8); 
+      console.log('Forma Propiedad:', this.formaPropiedad);
+      console.log('Unidad Areas:', this.unidadAreas);
     } catch (error) {
       console.error('Error al montar los componentes:', error);
-    }
-
-    //  Cargar IdPredio
-    try {      
-      console.log('ID DEL PREDIO TENENCIA:', this.getIdPredio);
-      /* await this.fetchTenencias(this.getIdPredio);*/ 
-    } catch (error) {
-      console.error('Error al montar el Id Predio:', error);
     }
   },
 
   methods: {
 
+    // Método para cargar los datos de la tenencia por idTenencia
+    async cargarDatosTenencia(id_tenencia) {
+      try {
+        const response = await axios.get(`http://localhost:3001/api/tenencia_by_id/${id_tenencia}`);
+        const tenencia = response.data;
+        console.log('Datos de la tenencia cargados:', tenencia);
+        // Asignar los datos de la tenencia al formulario
+        this.form.permite_ingreso = tenencia.permite_ingreso ? 'SI' : 'NO';
+        this.form.presenta_escritura = tenencia.presenta_escritura ? 'SI' : 'NO';
+        this.form.asentamiento_de_hecho = tenencia.asentamiento_de_hecho ? 'SI' : 'NO';
+        this.form.conflicto = tenencia.conflicto ? 'SI' : 'NO';
+        this.form.porcentaje_participacion = tenencia.porcentaje_participacion;
+        this.form.id_forma_propiedad = tenencia.id_forma_propiedad;
+        this.form.id_propietario = tenencia.id_propietario; // Asignar solo el id_ciudadano
+        this.form.id_prov_protocol = tenencia.id_prov_protocol;
+        this.form.id_can_protocol = tenencia.id_can_protocol;
+        this.form.fecha_inscripcion = tenencia.fecha_inscripcion.split('T')[0]; // Formato yyyy-MM-dd
+        this.form.numero_notaria = tenencia.numero_notaria;
+        this.form.area_registro = tenencia.area_registro;
+        this.form.id_unidad = tenencia.id_unidad;
+        this.form.id_provincia = tenencia.id_provincia;
+        this.form.id_canton = tenencia.id_canton;
+        this.form.fecha_escritura = tenencia.fecha_escritura.split('T')[0]; // Formato yyyy-MM-dd
+        this.form.repertorio = tenencia.repertorio;
+        this.form.folio = tenencia.folio;
+        this.form.numero_registro = tenencia.numero_registro;
+        this.form.lindero_norte = tenencia.lindero_norte;
+        this.form.lindero_sur = tenencia.lindero_sur;
+        this.form.lindero_este = tenencia.lindero_este;
+        this.form.lindero_oeste = tenencia.lindero_oeste;
+        this.form.propietario_anterior = tenencia.propietario_anterior;
+
+        // Cargar datos del propietario
+        await this.cargarDatosPropietario(tenencia.id_propietario);
+      } catch (error) {
+        console.error('Error al cargar los datos de la tenencia:', error);
+        alert('Error al cargar los datos de la tenencia');
+      }
+    },
+
+    // Método para cargar los datos del propietario por id_propietario
+    async cargarDatosPropietario(id_propietario) {
+      try {
+        const response = await axios.get(`http://localhost:3001/api/catastro_ciudadano_by_id/${id_propietario}`);
+        const propietario = response.data;
+        console.log('Datos del propietario cargados:', propietario);
+
+        // Asignar los datos del propietario al formulario
+        this.form.id_propietario = propietario.id_ciudadano; // Asignar solo el id_ciudadano
+      } catch (error) {
+        console.error('Error al cargar los datos del propietario:', error);
+        alert('Error al cargar los datos del propietario');
+      }
+    },
+
+    // Metodo para fitrar cantones por provincia de protocolizacion
     async onProvinciaProto() {
       this.form.id_can_protocol = '';
-      console.log('Provincia seleccionada:', this.form.id_prov_protocol);
+      console.log('Prov Protocolizacion:', this.form.id_prov_protocol);
       if (this.form.id_prov_protocol) {
-        console.log('ID de la provincia seleccionada:', this.form.id_prov_protocol);
+        console.log('ID de la prov protocolizacion:', this.form.id_prov_protocol);
         await this.fetchCantonesByProvincia(this.form.id_prov_protocol);
       } else {
         this.cantones = [];
       }
     },
 
+    // Metodo para fitrar cantones por provincia de registro
     async onProvinciaRegistro() {
       this.form.id_canton = '';
-      console.log('Provincia seleccionada:', this.form.id_provincia);
+      console.log('Prov Registri:', this.form.id_provincia);
       if (this.form.id_provincia) {
-        console.log('ID de la provincia seleccionada:', this.form.id_provincia);
-        await this.fetchCantonesByProvincia(this.form.id_provincia);
+        console.log('ID de la prov regiatro:', this.form.id_provincia);
+        await this.fetchCantonesByProvinciaRegistro(this.form.id_provincia);
       } else {
-        this.cantones = [];
+        this.cantonesReg = [];
       }
     },
 
+    // Cargar Provincias
     async fetchProvincias() {
       try {
         const response = await axios.get('http://localhost:3001/api/catalogo_provincia');
@@ -396,6 +477,7 @@ export default {
       }      
     },
 
+    // Cargar Cantones por Provincia 
     async fetchCantonesByProvincia(id_prov) {
       try {
         const response = await axios.get(`http://localhost:3001/api/catalogo_cantonByProvincia/${id_prov}`);
@@ -422,6 +504,34 @@ export default {
       }
     },
 
+    // Cargar Cantones por Provincia Registro 
+    async fetchCantonesByProvinciaRegistro(id_prov) {
+      try {
+        const response = await axios.get(`http://localhost:3001/api/catalogo_cantonByProvincia/${id_prov}`);
+        console.log('Datos obtenidos para cantones registro:', response.data);
+        if (Array.isArray(response.data)) {
+          this.cantonesReg = response.data.map(item => {
+            if (item.id_can && item.descripcion) {
+              return {
+                ...item,
+                id: `${item.id_can}`,
+                title: `${item.descripcion}`,                
+              };
+            } else {
+              console.warn('Elemento con datos incompletos:', item);
+              return null;
+            }
+          }).filter(item => item !== null);
+        } else {
+          throw new Error('La respuesta de la API no es un array');
+        }
+      } catch (error) {
+        console.error('Error fetching cantones:', error);
+        this.cantonesReg = [];
+      }
+    },
+
+    // Cargar Catalogo
     async fetchCatalogo(id_tipo_atributo) {
       try {
         const response = await axios.get('http://localhost:3001/api/catalogo', {
@@ -446,6 +556,7 @@ export default {
       }
     },
 
+    // Cargar Ciudadano
     async fetchCiudadanoTenencia() {
       try {
         const response = await axios.get('http://localhost:3001/api/ciudadano_tenencia');
@@ -467,14 +578,13 @@ export default {
           throw new Error('La respuesta de la API no es un array');
         }
       } catch (error) {
-        console.error('Error fetching provincias:', error);
+        console.error('Error fetching ciudadano:', error);
         this.ciudadanoTenencia = [];
       }      
     },
 
-
     // Guardar formulario
-    async guardar(){
+    async guardar() {
       console.log('Guardar formulario');
 
       // Validar permite_ingreso
@@ -484,14 +594,14 @@ export default {
       this.form.asentamiento_de_hecho = this.form.asentamiento_de_hecho === 'SI';
 
       const nuevaTenencia = {
-        id_predio : this.id_predio,
+        id_predio: this.id_predio, // Usar id_predio aquí
         permite_ingreso: this.form.permite_ingreso,
         presenta_escritura: this.form.presenta_escritura,
         asentamiento_de_hecho: this.form.asentamiento_de_hecho,
         conflicto: this.form.conflicto,
         porcentaje_participacion: this.form.porcentaje_participacion,
         id_forma_propiedad: this.form.id_forma_propiedad,
-        id_propietario: this.form.id_propietario,
+        id_propietario: this.form.id_propietario, // Enviar solo el id_ciudadano
         id_prov_protocol: this.form.id_prov_protocol,
         id_can_protocol: this.form.id_can_protocol,
         fecha_inscripcion: this.form.fecha_inscripcion,
@@ -523,12 +633,98 @@ export default {
       }
     },
 
-    navigateToMenuUrbano() { 
-      this.$router.push('/menu-urbano'); 
+    // Método para actualizar la tenencia
+    async actualizaTenencia() {
+      console.log('Actualizar tenencia');
+
+      // Validar permite_ingreso
+      this.form.permite_ingreso = this.form.permite_ingreso === 'SI';
+      this.form.presenta_escritura = this.form.presenta_escritura === 'SI';
+      this.form.conflicto = this.form.conflicto === 'SI';
+      this.form.asentamiento_de_hecho = this.form.asentamiento_de_hecho === 'SI';
+
+      const tenenciaActualizada = {
+        id_predio: this.id_predio, // Usar id_predio aquí
+        permite_ingreso: this.form.permite_ingreso,
+        presenta_escritura: this.form.presenta_escritura,
+        asentamiento_de_hecho: this.form.asentamiento_de_hecho,
+        conflicto: this.form.conflicto,
+        porcentaje_participacion: this.form.porcentaje_participacion,
+        id_forma_propiedad: this.form.id_forma_propiedad,
+        id_propietario: this.form.id_propietario, // Enviar solo el id_ciudadano
+        id_prov_protocol: this.form.id_prov_protocol,
+        id_can_protocol: this.form.id_can_protocol,
+        fecha_inscripcion: this.form.fecha_inscripcion,
+        numero_notaria: this.form.numero_notaria,
+        area_registro: this.form.area_registro,
+        id_unidad: this.form.id_unidad,
+        id_provincia: this.form.id_provincia,
+        id_canton: this.form.id_canton,
+        fecha_escritura: this.form.fecha_escritura,
+        repertorio: this.form.repertorio,
+        folio: this.form.folio,
+        numero_registro: this.form.numero_registro,
+        lindero_norte: this.form.lindero_norte,
+        lindero_sur: this.form.lindero_sur,
+        lindero_este: this.form.lindero_este,
+        lindero_oeste: this.form.lindero_oeste, 
+        propietario_anterior: this.form.propietario_anterior
+      }
+      console.log('Datos a actualizar', tenenciaActualizada);
+
+      try {
+        const response = await axios.put(`http://localhost:3001/api/actualiza_tenencia/${this.id_tenencia}`, tenenciaActualizada);
+        console.log('Tenencia actualizada', response.data);
+        alert('Tenencia actualizada con éxito');
+      } catch (error) {
+        console.error('Error al actualizar la tenencia', error);
+        alert(`Error al actualizar la tenencia: ${error.message.data.detail}`);
+      }
     },
-    navigateToCiudadano(){
-      this.$router.push('/ingreso-ciudadano'); 
-    }
+
+    // Método para limpiar el formulario
+    limpiarFormulario() {
+      this.form = {
+        permite_ingreso: null,
+        presenta_escritura: null,
+        asentamiento_de_hecho: null,
+        conflicto: null,
+        porcentaje_participacion: '',
+        id_forma_propiedad: null,
+        id_propietario: null,
+        id_prov_protocol: null,
+        id_can_protocol: null,
+        fecha_inscripcion: '',
+        numero_notaria: '',
+        area_registro: '',
+        id_unidad: null,
+        id_provincia: null,
+        id_canton: null,
+        fecha_escritura: '',
+        repertorio: '',
+        folio: '',
+        numero_registro: '',
+        lindero_norte: '',
+        lindero_sur: '',
+        lindero_este: '',
+        lindero_oeste: '', 
+        propietario_anterior: '',        
+      };
+    },
+
+    navigateToMenuUrbano() {
+      this.$router.push('/menu-urbano');
+    },
+    navigateToCiudadano() {
+      this.$router.push('/ingreso-ciudadano');
+    },
+
+    // Método para limpiar el formulario y preparar para una nueva entrada
+    nuevo() {
+      this.limpiarFormulario();
+      this.id_tenencia = null;
+      this.fetchCiudadanoTenencia(); // Cargar ciudadanos al iniciar nuevo
+    },
   }
 }
 </script>
